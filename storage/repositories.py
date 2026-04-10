@@ -26,29 +26,7 @@ class JobRepository:
         with self._get_connection() as connection:
             cursor = connection.cursor()
 
-            cursor.execute(
-                """
-                SELECT 1
-                FROM job_postings
-                WHERE source = ? AND external_id = ?
-                LIMIT 1
-                """,
-                (job.source, job.external_id),
-            )
-            row = cursor.fetchone()
-            if row:
-                return True
-
-            cursor.execute(
-                """
-                SELECT 1
-                FROM job_postings
-                WHERE url = ?
-                LIMIT 1
-                """,
-                (str(job.url),),
-            )
-            return cursor.fetchone() is not None
+            return self._job_exists_with_cursor(cursor, job)
 
     def insert_job_if_not_exists(self, job: JobPosting) -> bool:
         with self._get_connection() as connection:
@@ -103,19 +81,36 @@ class JobRepository:
     def mark_as_notified(self, job: JobPosting) -> None:
         with self._get_connection() as connection:
             cursor = connection.cursor()
-            cursor.execute(
-                """
-                UPDATE job_postings
-                SET status = ?, notified_at = ?
-                WHERE source = ? AND external_id = ?
-                """,
-                (
-                    "notified",
-                    datetime.now(timezone.utc).isoformat(),
-                    job.source,
-                    job.external_id,
-                ),
-            )
+            notification_timestamp = datetime.now(timezone.utc).isoformat()
+            unique_identifier = job.external_id.strip()
+
+            if unique_identifier:
+                cursor.execute(
+                    """
+                    UPDATE job_postings
+                    SET status = ?, notified_at = ?
+                    WHERE source = ? AND external_id = ?
+                    """,
+                    (
+                        "notified",
+                        notification_timestamp,
+                        job.source,
+                        unique_identifier,
+                    ),
+                )
+            else:
+                cursor.execute(
+                    """
+                    UPDATE job_postings
+                    SET status = ?, notified_at = ?
+                    WHERE url = ?
+                    """,
+                    (
+                        "notified",
+                        notification_timestamp,
+                        str(job.url),
+                    ),
+                )
 
     def list_new_jobs(self) -> list[dict]:
         with self._get_connection() as connection:
@@ -131,3 +126,31 @@ class JobRepository:
             )
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
+
+    @staticmethod
+    def _job_exists_with_cursor(cursor: sqlite3.Cursor, job: JobPosting) -> bool:
+        unique_identifier = job.external_id.strip()
+
+        if unique_identifier:
+            cursor.execute(
+                """
+                SELECT 1
+                FROM job_postings
+                WHERE source = ? AND external_id = ?
+                LIMIT 1
+                """,
+                (job.source, unique_identifier),
+            )
+            if cursor.fetchone():
+                return True
+
+        cursor.execute(
+            """
+            SELECT 1
+            FROM job_postings
+            WHERE url = ?
+            LIMIT 1
+            """,
+            (str(job.url),),
+        )
+        return cursor.fetchone() is not None

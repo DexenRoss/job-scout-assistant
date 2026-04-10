@@ -37,7 +37,16 @@ def main() -> None:
 
     for job in new_jobs:
         filtered_job = filter_service.evaluate(job)
-        repository.insert_job_if_not_exists(filtered_job)
+        inserted = repository.insert_job_if_not_exists(filtered_job)
+        if not inserted:
+            logger.warning(
+                "Skipped storage duplicate after deduplication for source=%s external_id=%s url=%s",
+                filtered_job.source,
+                filtered_job.external_id,
+                filtered_job.url,
+            )
+            continue
+
         inserted_count += 1
 
         if filtered_job.is_relevant:
