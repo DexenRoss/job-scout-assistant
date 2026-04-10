@@ -22,6 +22,9 @@ class JobPosting(BaseModel):
     normalized_tags: list[str] = Field(default_factory=list)
     is_relevant: bool = False
     relevance_reason: str | None = None
+    score: int | None = None
+    score_label: str | None = None
+    score_reasons: list[str] = Field(default_factory=list)
     status: Literal["new", "notified", "ignored"] = "new"
     source_board: str | None = None
     raw_location: str | None = None

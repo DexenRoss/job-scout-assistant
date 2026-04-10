@@ -20,12 +20,23 @@ def _parse_csv(value: str | None) -> list[str]:
     return [item.strip().lower() for item in value.split(",") if item.strip()]
 
 
+def _parse_int(value: str | None, default: int) -> int:
+    if value is None or not value.strip():
+        return default
+    return int(value.strip())
+
+
 @dataclass(frozen=True)
 class Settings:
     discord_webhook_url: str | None
     database_path: str
     include_keywords: list[str]
     exclude_keywords: list[str]
+    scoring_enabled: bool
+    scoring_min_notify_score: int
+    preferred_keywords: list[str]
+    preferred_locations: list[str]
+    seniority_preference: str | None
     greenhouse_enabled: bool
     greenhouse_company_boards: list[str]
     greenhouse_include_content: bool
@@ -44,6 +55,16 @@ def get_settings() -> Settings:
         database_path=os.getenv("DATABASE_PATH", default_db_path),
         include_keywords=_parse_csv(os.getenv("INCLUDE_KEYWORDS")),
         exclude_keywords=_parse_csv(os.getenv("EXCLUDE_KEYWORDS")),
+        scoring_enabled=_parse_bool(os.getenv("SCORING_ENABLED"), default=True),
+        scoring_min_notify_score=_parse_int(
+            os.getenv("SCORING_MIN_NOTIFY_SCORE"),
+            default=60,
+        ),
+        preferred_keywords=_parse_csv(os.getenv("PREFERRED_KEYWORDS")),
+        preferred_locations=_parse_csv(os.getenv("PREFERRED_LOCATIONS")),
+        seniority_preference=(
+            os.getenv("SENIORITY_PREFERENCE", "").strip().lower() or None
+        ),
         greenhouse_enabled=_parse_bool(os.getenv("GREENHOUSE_ENABLED"), default=True),
         greenhouse_company_boards=_parse_csv(os.getenv("GREENHOUSE_COMPANY_BOARDS")),
         greenhouse_include_content=_parse_bool(

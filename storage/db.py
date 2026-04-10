@@ -30,6 +30,9 @@ def initialize_database(database_path: str) -> None:
                 normalized_tags TEXT NOT NULL,
                 is_relevant INTEGER NOT NULL DEFAULT 0,
                 relevance_reason TEXT,
+                score INTEGER,
+                score_label TEXT,
+                score_reasons TEXT NOT NULL DEFAULT '[]',
                 status TEXT NOT NULL DEFAULT 'new',
                 source_board TEXT,
                 raw_location TEXT,
@@ -40,6 +43,25 @@ def initialize_database(database_path: str) -> None:
             )
             """
         )
+        _ensure_column(cursor, "job_postings", "score", "INTEGER")
+        _ensure_column(cursor, "job_postings", "score_label", "TEXT")
+        _ensure_column(cursor, "job_postings", "score_reasons", "TEXT NOT NULL DEFAULT '[]'")
         connection.commit()
     finally:
         connection.close()
+
+
+def _ensure_column(
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    column_name: str,
+    column_definition: str,
+) -> None:
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+    if column_name in existing_columns:
+        return
+
+    cursor.execute(
+        f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_definition}"
+    )

@@ -49,11 +49,14 @@ class JobRepository:
                     normalized_tags,
                     is_relevant,
                     relevance_reason,
+                    score,
+                    score_label,
+                    score_reasons,
                     status,
                     source_board,
                     raw_location
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     job.source,
@@ -71,6 +74,9 @@ class JobRepository:
                     json.dumps(job.normalized_tags, ensure_ascii=False),
                     int(job.is_relevant),
                     job.relevance_reason,
+                    job.score,
+                    job.score_label,
+                    json.dumps(job.score_reasons, ensure_ascii=False),
                     job.status,
                     job.source_board,
                     job.raw_location,
