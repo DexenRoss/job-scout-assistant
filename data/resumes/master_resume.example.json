@@ -1,0 +1,142 @@
+{
+  "basics": {
+    "full_name": "YOUR_FULL_NAME",
+    "headline": "YOUR_CURRENT_HEADLINE_OR_TARGET_ROLE",
+    "email": "your.email@example.com",
+    "phone": "+52-000-000-0000",
+    "location": "City, Country",
+    "linkedin": "https://www.linkedin.com/in/your-profile",
+    "github": "https://github.com/your-handle",
+    "website": "https://your-portfolio.example.com"
+  },
+  "summary": {
+    "base": "REPLACE_WITH_A_FACTUAL_2_TO_3_LINE_PROFESSIONAL_SUMMARY",
+    "highlights": [
+      "REPLACE_WITH_A_FACTUAL_HIGHLIGHT_ABOUT_EXPERIENCE",
+      "REPLACE_WITH_A_FACTUAL_HIGHLIGHT_ABOUT_TECHNICAL_STRENGTH",
+      "REPLACE_WITH_A_FACTUAL_HIGHLIGHT_ABOUT_IMPACT"
+    ]
+  },
+  "skills": [
+    {
+      "category": "Backend",
+      "items": [
+        "Python",
+        "FastAPI",
+        "Django",
+        "REST APIs"
+      ]
+    },
+    {
+      "category": "Data",
+      "items": [
+        "SQL",
+        "PostgreSQL",
+        "ETL",
+        "Pandas"
+      ]
+    },
+    {
+      "category": "Cloud And DevOps",
+      "items": [
+        "Docker",
+        "AWS",
+        "CI/CD",
+        "Linux"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "exp_backend_1",
+      "role": "YOUR_ROLE",
+      "company": "YOUR_COMPANY",
+      "location": "Remote",
+      "start_date": "YYYY-MM",
+      "end_date": null,
+      "current": true,
+      "bullets": [
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_YOUR_RESPONSIBILITIES",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_TECHNOLOGIES_USED",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_A_RESULT_YOU_CAN_DEFEND"
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "id": "exp_backend_2",
+      "role": "YOUR_PREVIOUS_ROLE",
+      "company": "YOUR_PREVIOUS_COMPANY",
+      "location": "City, Country",
+      "start_date": "YYYY-MM",
+      "end_date": "YYYY-MM",
+      "current": false,
+      "bullets": [
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_ANOTHER_RELEVANT_SCOPE",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_COLLABORATION_OR_OWNERSHIP",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_SYSTEMS_OR_RESULTS"
+      ],
+      "technologies": [
+        "Python",
+        "Django",
+        "Redis"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "project_1",
+      "name": "YOUR_PROJECT_NAME",
+      "role": "YOUR_ROLE_IN_THE_PROJECT",
+      "dates": "YYYY",
+      "description": "SHORT_FACTUAL_PROJECT_DESCRIPTION",
+      "bullets": [
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_THE_PROJECT_SCOPE",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_THE_STACK",
+        "REPLACE_WITH_A_FACTUAL_BULLET_ABOUT_THE_OUTCOME"
+      ],
+      "technologies": [
+        "Python",
+        "SQLite"
+      ],
+      "links": [
+        "https://github.com/your-handle/your-project"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "YOUR_INSTITUTION",
+      "degree": "YOUR_DEGREE",
+      "field_of_study": "YOUR_FIELD_OF_STUDY",
+      "start_date": "YYYY",
+      "end_date": "YYYY",
+      "details": [
+        "OPTIONAL_FACTUAL_DETAIL"
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "YOUR_CERTIFICATION_NAME",
+      "issuer": "ISSUER_NAME",
+      "issue_date": "YYYY-MM",
+      "expires_at": null,
+      "credential_id": null,
+      "credential_url": null
+    }
+  ],
+  "languages": [
+    {
+      "language": "Spanish",
+      "proficiency": "Native"
+    },
+    {
+      "language": "English",
+      "proficiency": "Professional working proficiency"
+    }
+  ]
+}

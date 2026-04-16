@@ -133,6 +133,47 @@ class JobRepository:
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
 
+    def get_job_by_id(self, job_id: int) -> JobPosting | None:
+        with self._get_connection() as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                SELECT *
+                FROM job_postings
+                WHERE id = ?
+                LIMIT 1
+                """,
+                (job_id,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+
+            return self._row_to_job_posting(row)
+
+    def get_top_job_for_tailoring(self) -> JobPosting | None:
+        with self._get_connection() as connection:
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                SELECT *
+                FROM job_postings
+                ORDER BY
+                    is_relevant DESC,
+                    COALESCE(score, -1) DESC,
+                    discovered_at DESC,
+                    id DESC
+                LIMIT 1
+                """
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+
+            return self._row_to_job_posting(row)
+
     @staticmethod
     def _job_exists_with_cursor(cursor: sqlite3.Cursor, job: JobPosting) -> bool:
         unique_identifier = job.external_id.strip()
@@ -160,3 +201,33 @@ class JobRepository:
             (str(job.url),),
         )
         return cursor.fetchone() is not None
+
+    @staticmethod
+    def _row_to_job_posting(row: sqlite3.Row) -> JobPosting:
+        normalized_tags = json.loads(row["normalized_tags"] or "[]")
+        score_reasons = json.loads(row["score_reasons"] or "[]")
+
+        return JobPosting(
+            id=row["id"],
+            source=row["source"],
+            external_id=row["external_id"],
+            title=row["title"],
+            company=row["company"],
+            location=row["location"],
+            employment_type=row["employment_type"],
+            seniority=row["seniority"],
+            salary_text=row["salary_text"],
+            url=row["url"],
+            description=row["description"],
+            date_posted=row["date_posted"],
+            discovered_at=datetime.fromisoformat(row["discovered_at"]),
+            normalized_tags=normalized_tags if isinstance(normalized_tags, list) else [],
+            is_relevant=bool(row["is_relevant"]),
+            relevance_reason=row["relevance_reason"],
+            score=row["score"],
+            score_label=row["score_label"],
+            score_reasons=score_reasons if isinstance(score_reasons, list) else [],
+            status=row["status"],
+            source_board=row["source_board"],
+            raw_location=row["raw_location"],
+        )
