@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, HttpUrl
 
 
 class JobPosting(BaseModel):
+    id: int | None = None
     source: str
     external_id: str
     title: str

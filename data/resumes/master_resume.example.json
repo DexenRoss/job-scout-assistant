@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "source_pdf": "data/resumes/master_resume.pdf",
+    "parser": "pypdf",
+    "extracted_at": "2026-04-16T00:00:00+00:00",
+    "page_count": 1,
+    "extraction_warnings": [],
+    "build_notes": []
+  },
+  "basics": {
+    "full_name": "YOUR_FULL_NAME",
+    "headline": "YOUR_HEADLINE",
+    "email": "your.email@example.com",
+    "phone": "+52-000-000-0000",
+    "location": "City, Country",
+    "linkedin": "https://www.linkedin.com/in/your-profile",
+    "github": "https://github.com/your-handle",
+    "website": "https://your-portfolio.example.com"
+  },
+  "summary": {
+    "base": "FACTUAL_2_TO_3_LINE_PROFESSIONAL_SUMMARY",
+    "highlights": [
+      "FACTUAL_HIGHLIGHT_1",
+      "FACTUAL_HIGHLIGHT_2"
+    ]
+  },
+  "skills": [
+    {
+      "category": "Backend",
+      "items": [
+        "Python",
+        "FastAPI",
+        "Django",
+        "REST APIs"
+      ]
+    },
+    {
+      "category": "Data",
+      "items": [
+        "SQL",
+        "PostgreSQL",
+        "ETL",
+        "Pandas"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "id": "experience_1",
+      "role": "Senior Backend Engineer",
+      "company": "Example Company",
+      "location": "Remote",
+      "start_date": "2022-01",
+      "end_date": null,
+      "current": true,
+      "bullets": [
+        "FACTUAL_BULLET_1",
+        "FACTUAL_BULLET_2"
+      ],
+      "technologies": [
+        "Python",
+        "PostgreSQL"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "project_1",
+      "name": "Project Name",
+      "role": "Creator",
+      "dates": "2024",
+      "description": "FACTUAL_PROJECT_DESCRIPTION",
+      "bullets": [
+        "FACTUAL_PROJECT_BULLET"
+      ],
+      "technologies": [
+        "Python",
+        "SQLite"
+      ],
+      "links": [
+        "https://github.com/your-handle/project"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University Name",
+      "degree": "Degree Name",
+      "field_of_study": "Field",
+      "start_date": "2018",
+      "end_date": "2022",
+      "details": [
+        "OPTIONAL_DETAIL"
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Certification Name",
+      "issuer": "Issuer",
+      "issue_date": "2024-01",
+      "expires_at": null,
+      "credential_id": null,
+      "credential_url": null
+    }
+  ],
+  "languages": [
+    {
+      "language": "Spanish",
+      "proficiency": "Native"
+    },
+    {
+      "language": "English",
+      "proficiency": "Professional working proficiency"
+    }
+  ]
+}
