@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup, Tag
 
 from core.logger import get_logger
 from core.models import JobPosting
-from sources.base import JobSource
+from sources.base import JobSource, SourceUnavailableError
 
 logger = get_logger(__name__)
 
@@ -64,13 +64,46 @@ class IndeedSource(JobSource):
         if self.location:
             params["l"] = self.location
 
-        response = requests.get(
-            urljoin(self.BASE_URL, self.SEARCH_PATH),
-            params=params,
-            headers=self.SEARCH_HEADERS,
-            timeout=self.timeout_seconds,
-        )
-        response.raise_for_status()
+        try:
+            response = requests.get(
+                urljoin(self.BASE_URL, self.SEARCH_PATH),
+                params=params,
+                headers=self.SEARCH_HEADERS,
+                timeout=self.timeout_seconds,
+            )
+            response.raise_for_status()
+        except requests.HTTPError as exc:
+            status_code = exc.response.status_code if exc.response is not None else None
+            if status_code == 403:
+                raise SourceUnavailableError(
+                    self.source_name,
+                    "Indeed blocked the automated query with HTTP 403 Forbidden; the source will be skipped.",
+                ) from exc
+            if status_code == 429:
+                raise SourceUnavailableError(
+                    self.source_name,
+                    "Indeed rate-limited the automated query with HTTP 429 Too Many Requests; the source will be skipped.",
+                ) from exc
+            raise SourceUnavailableError(
+                self.source_name,
+                f"Indeed returned HTTP {status_code or 'unknown'} during discovery; the source will be skipped.",
+            ) from exc
+        except requests.Timeout as exc:
+            raise SourceUnavailableError(
+                self.source_name,
+                "Indeed timed out during discovery; the source will be skipped.",
+            ) from exc
+        except requests.ConnectionError as exc:
+            raise SourceUnavailableError(
+                self.source_name,
+                "Indeed could not be reached due to a connection error; the source will be skipped.",
+            ) from exc
+        except requests.RequestException as exc:
+            raise SourceUnavailableError(
+                self.source_name,
+                "Indeed request failed during discovery; the source will be skipped.",
+            ) from exc
+
         return response.text
 
     def _parse_search_results(self, html: str) -> list[JobPosting]:

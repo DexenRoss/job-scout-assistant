@@ -6,6 +6,12 @@ from abc import ABC, abstractmethod
 from core.models import JobPosting
 
 
+class SourceUnavailableError(RuntimeError):
+    def __init__(self, source_name: str, message: str) -> None:
+        self.source_name = source_name
+        super().__init__(message)
+
+
 class JobSource(ABC):
     source_name: str
 

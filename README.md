@@ -5,7 +5,7 @@ Job Scout Assistant descubre vacantes desde múltiples fuentes, las filtra por p
 Sprint 4A deja el discovery preparado para múltiples fuentes:
 
 - `Greenhouse`: funcional
-- `Indeed`: funcional
+- `Indeed`: opcional, best-effort y limitada por el acceso público disponible
 - `OCC`: preparado como stub, deshabilitado por defecto
 - `Computrabajo`: preparado como stub, deshabilitado por defecto
 
@@ -74,13 +74,13 @@ Notas de Sprint 4A:
 
 - `discover_jobs` carga las fuentes desde `sources/registry.py`.
 - Cada fuente solo descubre y mapea vacantes a `JobPosting`.
-- Si una fuente falla, el proceso sigue con las demás.
+- Si una fuente falla o queda no disponible, el proceso sigue con las demás.
 - La deduplicación sigue corriendo en el pipeline compartido y ahora contempla coincidencias simples entre fuentes por `title + company + location`.
 
 ## Fuentes Soportadas Hoy
 
 - `Greenhouse`: usa `GREENHOUSE_COMPANY_BOARDS`.
-- `Indeed`: usa una búsqueda única configurable y devuelve las vacantes de la primera página de resultados, suficiente para una integración incremental y no agresiva.
+- `Indeed`: usa una búsqueda única configurable sobre HTML público y debe considerarse una fuente opcional / experimental. Puede devolver `403 Forbidden`, `429 Too Many Requests` u otros errores de acceso al consultar de forma automatizada con el enfoque actual.
 - `OCC` y `Computrabajo`: existen como puntos de extensión y no están activas por defecto.
 
 ## Activar Indeed
@@ -100,6 +100,7 @@ Comportamiento:
 - `INDEED_LOCATION`: ubicación enviada al buscador.
 - `INDEED_REMOTE_ONLY=true`: aplica un filtro conservador por señales remotas sobre los resultados ya descubiertos.
 - Indeed entra al mismo pipeline de deduplicación, scoring, SQLite y Discord; no existe un flujo especial para esa fuente.
+- Si Indeed responde con bloqueo o un error controlado de acceso externo, la fuente se omite con `warning` y el resto de la ejecución continúa sin traceback.
 
 ## Scoring
 
@@ -124,6 +125,7 @@ Si tu entorno solo expone `python3`, usa `python3 -m app`. No uses `python app/m
 - Las vacantes nuevas se guardan en SQLite.
 - Solo las vacantes nuevas, relevantes y con score suficiente se notifican por Discord.
 - La deduplicación se hace contra el batch actual y contra la base de datos.
+- Si Indeed está habilitada pero el acceso automatizado es bloqueado, la app termina normalmente y sigue con las demás fuentes activas.
 
 ## CV Maestro Basado En PDF
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 from core.config import Settings
 from core.logger import get_logger
 from core.models import JobPosting
+from sources.base import SourceUnavailableError
 from sources.registry import build_source_bindings
 
 logger = get_logger(__name__)
@@ -22,6 +23,13 @@ def discover_jobs(settings: Settings) -> list[JobPosting]:
 
         try:
             source_jobs = binding.source.fetch_jobs()
+        except SourceUnavailableError as exc:
+            logger.warning(
+                "Skipping source '%s': %s",
+                binding.name,
+                exc,
+            )
+            continue
         except Exception as exc:
             logger.exception("Source '%s' failed during discovery: %s", binding.name, exc)
             continue
