@@ -1,6 +1,11 @@
 # Job Scout Assistant
 
-Job Scout Assistant descubre vacantes desde Greenhouse, las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
+Job Scout Assistant descubre vacantes desde múltiples fuentes, las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
+
+Fuentes soportadas hoy:
+
+- `Greenhouse`: funcional
+- `Computrabajo`: funcional en modo best-effort sobre páginas públicas de búsqueda
 
 Sprint 3 agrega una capa opcional de CV maestro basada en PDF:
 
@@ -30,10 +35,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Dependencias nuevas del Sprint 3:
+Dependencias relevantes:
 
 - `pypdf`: extracción de texto desde PDFs con capa de texto
 - `reportlab`: exportación simple y estable del CV adaptado a PDF
+- `beautifulsoup4`: parsing HTML ligero para fuentes públicas como Computrabajo
 
 ## Configuración
 
@@ -52,9 +58,20 @@ SENIORITY_PREFERENCE=senior
 GREENHOUSE_ENABLED=true
 GREENHOUSE_COMPANY_BOARDS=empresa-a,empresa-b
 GREENHOUSE_INCLUDE_CONTENT=true
+COMPUTRABAJO_ENABLED=false
+COMPUTRABAJO_QUERY=python backend
+COMPUTRABAJO_LOCATION=Ciudad de Mexico
+COMPUTRABAJO_REMOTE_ONLY=true
 REQUEST_TIMEOUT_SECONDS=20
 LOG_LEVEL=INFO
 ```
+
+## Discovery Multi-Fuente
+
+- `discover_jobs` construye las fuentes activas desde `sources/registry.py`.
+- Cada fuente solo descubre vacantes y las mapea a `JobPosting`.
+- El pipeline compartido mantiene deduplicación, filtrado, scoring, persistencia y notificaciones.
+- Si una fuente externa falla por una causa esperable, se registra un `warning` y el sistema sigue con las demás.
 
 ## Scoring
 
@@ -75,10 +92,29 @@ Si tu entorno solo expone `python3`, usa `python3 -m app`. No uses `python app/m
 
 ## Uso básico
 
-- Configura al menos un board en `GREENHOUSE_COMPANY_BOARDS`.
+- Configura al menos una fuente activa.
 - Las vacantes nuevas se guardan en SQLite.
 - Solo las vacantes nuevas, relevantes y con score suficiente se notifican por Discord.
 - La deduplicación se hace contra el batch actual y contra la base de datos.
+
+## Activar Computrabajo
+
+Configura en `.env`:
+
+```env
+COMPUTRABAJO_ENABLED=true
+COMPUTRABAJO_QUERY=python backend
+COMPUTRABAJO_LOCATION=Ciudad de Mexico
+COMPUTRABAJO_REMOTE_ONLY=true
+```
+
+Comportamiento:
+
+- `COMPUTRABAJO_QUERY`: término principal de búsqueda.
+- `COMPUTRABAJO_LOCATION`: ubicación usada para construir la búsqueda pública.
+- `COMPUTRABAJO_REMOTE_ONLY=true`: filtra resultados a ofertas con señal remota o híbrida.
+- La integración es best-effort: depende de páginas públicas de búsqueda.
+- Si Computrabajo devuelve bloqueo o un error externo controlado, la app sigue ejecutándose con las demás fuentes.
 
 ## CV Maestro Basado En PDF
 

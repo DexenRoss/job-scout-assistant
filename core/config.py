@@ -40,6 +40,10 @@ class Settings:
     greenhouse_enabled: bool
     greenhouse_company_boards: list[str]
     greenhouse_include_content: bool
+    computrabajo_enabled: bool
+    computrabajo_query: str | None
+    computrabajo_location: str | None
+    computrabajo_remote_only: bool
     request_timeout_seconds: float
     log_level: str
 
@@ -69,6 +73,16 @@ def get_settings() -> Settings:
         greenhouse_company_boards=_parse_csv(os.getenv("GREENHOUSE_COMPANY_BOARDS")),
         greenhouse_include_content=_parse_bool(
             os.getenv("GREENHOUSE_INCLUDE_CONTENT"), default=True
+        ),
+        computrabajo_enabled=_parse_bool(
+            os.getenv("COMPUTRABAJO_ENABLED"),
+            default=False,
+        ),
+        computrabajo_query=os.getenv("COMPUTRABAJO_QUERY", "").strip() or None,
+        computrabajo_location=os.getenv("COMPUTRABAJO_LOCATION", "").strip() or None,
+        computrabajo_remote_only=_parse_bool(
+            os.getenv("COMPUTRABAJO_REMOTE_ONLY"),
+            default=False,
         ),
         request_timeout_seconds=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "20")),
         log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
