@@ -200,6 +200,25 @@ class JobRepository:
             """,
             (str(job.url),),
         )
+        if cursor.fetchone():
+            return True
+
+        fingerprint = job.deduplication_fingerprint()
+        if not fingerprint:
+            return False
+
+        title_key, company_key, location_key = fingerprint
+        cursor.execute(
+            """
+            SELECT 1
+            FROM job_postings
+            WHERE LOWER(TRIM(title)) = ?
+              AND LOWER(TRIM(company)) = ?
+              AND LOWER(TRIM(COALESCE(location, raw_location, ''))) = ?
+            LIMIT 1
+            """,
+            (title_key, company_key, location_key),
+        )
         return cursor.fetchone() is not None
 
     @staticmethod

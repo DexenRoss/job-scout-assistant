@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, HttpUrl
+
+DEDUP_NORMALIZE_PATTERN = re.compile(r"\s+")
 
 
 class JobPosting(BaseModel):
@@ -33,3 +36,19 @@ class JobPosting(BaseModel):
     def unique_key(self) -> tuple[str, str]:
         fallback = self.external_id.strip() if self.external_id.strip() else str(self.url)
         return self.source, fallback
+
+    def deduplication_fingerprint(self) -> tuple[str, str, str] | None:
+        title = self._normalize_for_dedup(self.title)
+        company = self._normalize_for_dedup(self.company)
+        location = self._normalize_for_dedup(self.location or self.raw_location)
+
+        if not title or not company or not location:
+            return None
+
+        return title, company, location
+
+    @staticmethod
+    def _normalize_for_dedup(value: str | None) -> str:
+        if not value:
+            return ""
+        return DEDUP_NORMALIZE_PATTERN.sub(" ", value.lower().strip())

@@ -1,6 +1,13 @@
 # Job Scout Assistant
 
-Job Scout Assistant descubre vacantes desde Greenhouse, las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
+Job Scout Assistant descubre vacantes desde múltiples fuentes, las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
+
+Sprint 4A deja el discovery preparado para múltiples fuentes:
+
+- `Greenhouse`: funcional
+- `Indeed`: funcional
+- `OCC`: preparado como stub, deshabilitado por defecto
+- `Computrabajo`: preparado como stub, deshabilitado por defecto
 
 Sprint 3 agrega una capa opcional de CV maestro basada en PDF:
 
@@ -30,10 +37,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Dependencias nuevas del Sprint 3:
+Dependencias relevantes:
 
 - `pypdf`: extracción de texto desde PDFs con capa de texto
 - `reportlab`: exportación simple y estable del CV adaptado a PDF
+- `beautifulsoup4`: parsing del HTML de resultados de Indeed
 
 ## Configuración
 
@@ -52,9 +60,46 @@ SENIORITY_PREFERENCE=senior
 GREENHOUSE_ENABLED=true
 GREENHOUSE_COMPANY_BOARDS=empresa-a,empresa-b
 GREENHOUSE_INCLUDE_CONTENT=true
+INDEED_ENABLED=false
+INDEED_QUERY=python backend
+INDEED_LOCATION=Mexico
+INDEED_REMOTE_ONLY=true
+OCC_ENABLED=false
+COMPUTRABAJO_ENABLED=false
 REQUEST_TIMEOUT_SECONDS=20
 LOG_LEVEL=INFO
 ```
+
+Notas de Sprint 4A:
+
+- `discover_jobs` carga las fuentes desde `sources/registry.py`.
+- Cada fuente solo descubre y mapea vacantes a `JobPosting`.
+- Si una fuente falla, el proceso sigue con las demás.
+- La deduplicación sigue corriendo en el pipeline compartido y ahora contempla coincidencias simples entre fuentes por `title + company + location`.
+
+## Fuentes Soportadas Hoy
+
+- `Greenhouse`: usa `GREENHOUSE_COMPANY_BOARDS`.
+- `Indeed`: usa una búsqueda única configurable y devuelve las vacantes de la primera página de resultados, suficiente para una integración incremental y no agresiva.
+- `OCC` y `Computrabajo`: existen como puntos de extensión y no están activas por defecto.
+
+## Activar Indeed
+
+Configura en `.env`:
+
+```env
+INDEED_ENABLED=true
+INDEED_QUERY=python backend
+INDEED_LOCATION=Mexico
+INDEED_REMOTE_ONLY=true
+```
+
+Comportamiento:
+
+- `INDEED_QUERY`: término principal de búsqueda.
+- `INDEED_LOCATION`: ubicación enviada al buscador.
+- `INDEED_REMOTE_ONLY=true`: aplica un filtro conservador por señales remotas sobre los resultados ya descubiertos.
+- Indeed entra al mismo pipeline de deduplicación, scoring, SQLite y Discord; no existe un flujo especial para esa fuente.
 
 ## Scoring
 
@@ -75,7 +120,7 @@ Si tu entorno solo expone `python3`, usa `python3 -m app`. No uses `python app/m
 
 ## Uso básico
 
-- Configura al menos un board en `GREENHOUSE_COMPANY_BOARDS`.
+- Configura al menos una fuente activa: Greenhouse o Indeed.
 - Las vacantes nuevas se guardan en SQLite.
 - Solo las vacantes nuevas, relevantes y con score suficiente se notifican por Discord.
 - La deduplicación se hace contra el batch actual y contra la base de datos.

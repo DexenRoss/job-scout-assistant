@@ -75,13 +75,28 @@ class GreenhouseSource(JobSource):
         salary_text = self._extract_metadata_value(metadata, ["salary", "compensation", "pay range"])
         description = raw_job.get("content")
 
-        normalized_tags = self._build_normalized_tags(
-            title=title,
-            company=company,
-            location=location,
-            employment_type=employment_type,
-            seniority=seniority,
-            metadata=metadata,
+        metadata_values: list[str] = []
+        for item in metadata:
+            name = str(item.get("name", "")).strip()
+            value = item.get("value")
+
+            if name:
+                metadata_values.append(name)
+
+            if isinstance(value, str) and value.strip():
+                metadata_values.append(value.strip())
+            elif isinstance(value, list):
+                metadata_values.extend(
+                    str(entry).strip() for entry in value if str(entry).strip()
+                )
+
+        normalized_tags = self.build_normalized_tags(
+            title,
+            company,
+            location,
+            employment_type,
+            seniority,
+            *metadata_values,
         )
 
         external_id = str(raw_job.get("id", "")).strip()
@@ -136,39 +151,3 @@ class GreenhouseSource(JobSource):
                     return ", ".join(values)
 
         return None
-
-    @staticmethod
-    def _build_normalized_tags(
-        title: str,
-        company: str,
-        location: str | None,
-        employment_type: str | None,
-        seniority: str | None,
-        metadata: list[dict[str, Any]],
-    ) -> list[str]:
-        tags: list[str] = []
-
-        for value in [title, company, location, employment_type, seniority]:
-            if value:
-                tags.extend(GreenhouseSource._tokenize(value))
-
-        for item in metadata:
-            name = str(item.get("name", "")).strip()
-            value = item.get("value")
-
-            if name:
-                tags.extend(GreenhouseSource._tokenize(name))
-
-            if isinstance(value, str):
-                tags.extend(GreenhouseSource._tokenize(value))
-            elif isinstance(value, list):
-                for entry in value:
-                    tags.extend(GreenhouseSource._tokenize(str(entry)))
-
-        deduplicated = sorted({tag for tag in tags if tag})
-        return deduplicated
-
-    @staticmethod
-    def _tokenize(text: str) -> list[str]:
-        cleaned = text.replace("/", " ").replace("-", " ").replace(",", " ")
-        return [part.strip().lower() for part in cleaned.split() if part.strip()]

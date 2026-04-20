@@ -40,6 +40,12 @@ class Settings:
     greenhouse_enabled: bool
     greenhouse_company_boards: list[str]
     greenhouse_include_content: bool
+    indeed_enabled: bool
+    indeed_query: str | None
+    indeed_location: str | None
+    indeed_remote_only: bool
+    occ_enabled: bool
+    computrabajo_enabled: bool
     request_timeout_seconds: float
     log_level: str
 
@@ -69,6 +75,15 @@ def get_settings() -> Settings:
         greenhouse_company_boards=_parse_csv(os.getenv("GREENHOUSE_COMPANY_BOARDS")),
         greenhouse_include_content=_parse_bool(
             os.getenv("GREENHOUSE_INCLUDE_CONTENT"), default=True
+        ),
+        indeed_enabled=_parse_bool(os.getenv("INDEED_ENABLED"), default=False),
+        indeed_query=os.getenv("INDEED_QUERY", "").strip() or None,
+        indeed_location=os.getenv("INDEED_LOCATION", "").strip() or None,
+        indeed_remote_only=_parse_bool(os.getenv("INDEED_REMOTE_ONLY"), default=False),
+        occ_enabled=_parse_bool(os.getenv("OCC_ENABLED"), default=False),
+        computrabajo_enabled=_parse_bool(
+            os.getenv("COMPUTRABAJO_ENABLED"),
+            default=False,
         ),
         request_timeout_seconds=float(os.getenv("REQUEST_TIMEOUT_SECONDS", "20")),
         log_level=os.getenv("LOG_LEVEL", "INFO").upper(),
