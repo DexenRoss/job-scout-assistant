@@ -1,6 +1,6 @@
 # Job Scout Assistant
 
-Job Scout Assistant descubre vacantes desde Greenhouse, las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
+Job Scout Assistant descubre vacantes desde Greenhouse y Computrabajo las filtra por palabras clave, elimina duplicados, las puntúa con reglas configurables, las guarda en SQLite y envía alertas relevantes por Discord.
 
 Sprint 3 agrega una capa opcional de CV maestro basada en PDF:
 
@@ -62,6 +62,10 @@ LOG_LEVEL=INFO
 - Analiza `title`, `description`, `company`, `location` y `normalized_tags`.
 - Produce `score` de 0 a 100, `score_label` y una lista corta de razones legibles.
 - `SCORING_MIN_NOTIFY_SCORE` define el umbral mínimo para notificar una vacante relevante.
+
+## LLMs
+
+- Se esta trabajando de forma local la integración de un modelo de IA para la busqueda y creación del cv adecuado.
 
 ## Ejecución
 
